@@ -37,14 +37,14 @@
 
 		<!-- FORM TO CREATE TODOS -->
 		<div id="todo-form" class="row">
-			<div class="col-sm-8 col-sm-offset-2 text-center">
-				<form class="form-inline col-sm-10">
-					<div class="form-group">
+			<div class="col-sm-10 text-center">
+				<form class="form-inline col-sm-10 col-sm-offset-2">
+					<div class="form-group col-sm-12">
 
 						<!-- BIND THIS VALUE TO formData.text IN ANGULAR -->
-						<input type="text" class="form-group input-lg text-center" placeholder="I want to buy a puppy that will love me forever" ng-model="formData.text">		
+						<input type="text" class="form-group col-sm-10 input-lg text-center" placeholder="I have to do..." ng-model="formData.text">		
 						<!-- createToDo() WILL CREATE NEW TODOS -->
-						<button type="submit" class="btn btn-primary btn-lg" ng-click="createTodo()">Add</button>
+						<button type="submit" class="btn btn-primary col-sm-2 btn-lg" ng-click="createTodo()">Add</button>
 					</div>	
 				</form>
 			</div>
@@ -52,10 +52,26 @@
 
 		<!-- TODO LIST -->
 		<div id="todo-list" class="row">
-			<div class="col-sm-4 col-sm-offset-4">
+			<div class="col-sm-4 col-sm-offset-3">
 
-				<!-- LOOP OVER THE TODOS IN $scope.todos -->
-				<div class="checkbox" ng-repeat="todo in todos">
+				<!-- LOOP OVER THE TODOS IN $scope.todosPending -->
+				<span class="label label-primary">Pending To-Do</span>
+				<div class="checkbox" ng-repeat="todo in todosPending">
+					<label class="inline">
+						<input type="checkbox" ng-click="doneTodo(todo._id)"> 
+						<span class="{{todo.done}}">{{ todo.text }}</span>
+						<span><i class="glyphicon glyphicon-pencil"></i></span>
+						<span ng-click="deleteTodo(todo._id)"><i class="glyphicon glyphicon-remove"></i></span>
+					</label>
+				</div>
+
+			</div>
+
+			<div class="col-sm-4">
+
+				<!-- LOOP OVER THE TODOS IN $scope.todosDone -->
+				<span class="label label-default">Done To-Do</span>
+				<div class="checkbox" ng-repeat="todo in todosDone">
 					<label class="inline">
 						<input type="checkbox" ng-click="doneTodo(todo._id)"> 
 						<span class="{{todo.done}}">{{ todo.text }}</span>

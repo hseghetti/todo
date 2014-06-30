@@ -6,8 +6,9 @@ function mainController($scope, $http) {
 	//when landing on the page, get all todos and show them
 	$http.get('/api/todos')
 		.success(function(data) {
-			$scope.todos = data;
-			console.log(data);			
+			console.log(data);
+			$scope.todosPending = $todosPending(data);
+			$scope.todosDone = $todosDone(data);
 			$scope.remaining = $remaining(data);
 		})
 		.error(function(data) {
@@ -19,7 +20,8 @@ function mainController($scope, $http) {
 		$http.post('/api/todos', $scope.formData)
 			.success(function(data) {
 				$scope.formData = {}; // clear the form so our user is ready to enter another
-				$scope.todos = data;
+				$scope.todosPending = $todosPending(data);
+				$scope.todosDone = $todosDone(data);
 				$scope.remaining = $remaining(data);
 				console.log(data);
 			})
@@ -32,7 +34,8 @@ function mainController($scope, $http) {
 	$scope.deleteTodo = function(id) {
 		$http.delete('/api/todos/' + id)
 			.success(function(data) {
-				$scope.todos = data;
+				$scope.todosPending = $todosPending(data);
+				$scope.todosDone = $todosDone(data);
 				$scope.remaining = $remaining(data);
 				console.log(data);
 			})
@@ -45,7 +48,8 @@ function mainController($scope, $http) {
 	$scope.doneTodo = function(id) {
 		$http.post('/api/todos/done/' + id)
 			.success(function(data) {
-				$scope.todos = data;
+				$scope.todosPending = $todosPending(data);
+				$scope.todosDone = $todosDone(data);
 				$scope.remaining = $remaining(data);
 				console.log(data);
 			})
@@ -60,6 +64,26 @@ function mainController($scope, $http) {
 			count += t.done ? 0 : 1;
 		});
 		return count;
+	};
+
+	$todosPending = function(todos) {
+		var todosPending = [];
+		angular.forEach(todos, function(t) {
+			if(!t.done) {
+				todosPending.push(t);
+			}
+		});
+		return todosPending;
+	};
+
+	$todosDone = function(todos) {
+		var todosDone = [];
+		angular.forEach(todos, function(t) {
+			if(t.done) {
+				todosDone.push(t);
+			}
+		});
+		return todosDone;	
 	};
 
 }
