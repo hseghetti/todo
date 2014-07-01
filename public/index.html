@@ -38,13 +38,14 @@
 		<!-- FORM TO CREATE TODOS -->
 		<div id="todo-form" class="row">
 			<div class="col-sm-10 text-center">
-				<form class="form-inline col-sm-10 col-sm-offset-2">
+				<form class="form-inline col-sm-10 col-sm-offset-2" id="todoForm" name="todoForm" ng-submit="createTodo()">
 					<div class="form-group col-sm-12">
 
 						<!-- BIND THIS VALUE TO formData.text IN ANGULAR -->
-						<input type="text" class="form-group col-sm-10 input-lg text-center" placeholder="I have to do..." ng-model="formData.text">		
+						<input type="text" class="form-group col-sm-10 input-lg text-center" placeholder="I have to do..." ng-model="formData.text" ng-minlength=1 required name="todoText" />		
 						<!-- createToDo() WILL CREATE NEW TODOS -->
-						<button type="submit" class="btn btn-primary col-sm-2 btn-lg" ng-click="createTodo()">Add</button>
+						<button type="submit" class="btn btn-primary col-sm-2 btn-lg" 
+						ng-disabled="todoForm.todoText.$invalid" >Add</button>
 					</div>	
 				</form>
 			</div>
@@ -82,5 +83,6 @@
 			</div>
 		</div>
 	</div>
+
 </body>
 </html>
