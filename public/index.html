@@ -58,32 +58,29 @@
 				<span class="label label-primary">Pending To-Do</span>
 				<div class="checkbox" ng-repeat="todo in todosPending">
 					<label class="inline">
-						<input type="checkbox" ng-click="doneTodo(todo._id)"> 
+						<input type="checkbox" ng-click="doneTodo(todo._id)">
 						<span class="{{todo.done}}">{{ todo.text }}</span>
-						<span><i class="glyphicon glyphicon-pencil"></i></span>
-						<span ng-click="deleteTodo(todo._id)"><i class="glyphicon glyphicon-remove"></i></span>
-					</label>
+					</label> 
+					<span><i class="glyphicon glyphicon-pencil"></i></span>
+					<span ng-click="deleteTodo(todo._id)"><i class="glyphicon glyphicon-remove"></i></span>
+					
 				</div>
 
 			</div>
 
 			<div class="col-sm-4">
-
 				<!-- LOOP OVER THE TODOS IN $scope.todosDone -->
 				<span class="label label-default">Done To-Do</span>
-				<div class="checkbox" ng-repeat="todo in todosDone">
+				<div class="checkbox" ng-repeat="todo2 in todosDone">
 					<label class="inline">
-						<input type="checkbox" ng-click="doneTodo(todo._id)"> 
-						<span class="{{todo.done}}">{{ todo.text }}</span>
-						<span><i class="glyphicon glyphicon-pencil"></i></span>
-						<span ng-click="deleteTodo(todo._id)"><i class="glyphicon glyphicon-remove"></i></span>
-					</label>
+						<input type="checkbox" checked ng-click="undoneTodo(todo2._id)"> 
+						<span class="{{todo2.done}}">{{ todo2.text }}</span>
+					</label>	
+					<span><i class="glyphicon glyphicon-pencil"></i></span>
+					<span ng-click="deleteTodo(todo2._id)"><i class="glyphicon glyphicon-remove"></i></span>
 				</div>
-
 			</div>
 		</div>
-
 	</div>
-
 </body>
 </html>

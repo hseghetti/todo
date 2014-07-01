@@ -23,7 +23,6 @@ function mainController($scope, $http) {
 				$scope.todosPending = $todosPending(data);
 				$scope.todosDone = $todosDone(data);
 				$scope.remaining = $remaining(data);
-				console.log(data);
 			})
 			.error(function(data) {
 				console.log('Error: ' + data);
@@ -37,7 +36,6 @@ function mainController($scope, $http) {
 				$scope.todosPending = $todosPending(data);
 				$scope.todosDone = $todosDone(data);
 				$scope.remaining = $remaining(data);
-				console.log(data);
 			})
 			.error(function(data) {
 				console.log('Error: ' + data);
@@ -51,7 +49,19 @@ function mainController($scope, $http) {
 				$scope.todosPending = $todosPending(data);
 				$scope.todosDone = $todosDone(data);
 				$scope.remaining = $remaining(data);
-				console.log(data);
+			})
+			.error(function(data) {
+				console.log('Error: ' + data);
+			});
+	};
+
+	// done a todo after checking it
+	$scope.undoneTodo = function(id) {
+		$http.post('/api/todos/undone/' + id)
+			.success(function(data) {
+				$scope.todosPending = $todosPending(data);
+				$scope.todosDone = $todosDone(data);
+				$scope.remaining = $remaining(data);
 			})
 			.error(function(data) {
 				console.log('Error: ' + data);

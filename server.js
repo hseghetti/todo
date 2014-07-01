@@ -62,17 +62,41 @@
 			else {
 				todo.done = true;
 				todo.save(function(err) {
-					if(err)
-						res.send(err)
+					if(err) {
+						res.send(err + "error rr");
+					} else {
+						// get and return all the todos after you create another
+						Todo.find(function(err, todos) {
+							if (err)
+								res.send(err);
+							res.json(todos);
+						});
+					}
 				});	
 			}
+		});
+	});
 
-			// get and return all the todos after you create another
-			Todo.find(function(err, todos) {
-				if (err)
-					res.send(err);
-				res.json(todos);
-			});
+	//todo undone
+	app.post('/api/todos/undone/:todo_id', function(req, res) {
+		Todo.findById(req.params.todo_id, function(err, todo) {
+			if (!todo)
+				res.send("Could not find Todo");
+			else {
+				todo.done = false;
+				todo.save(function(err) {
+					if(err) {
+						res.send(err + "error rr");
+					} else {
+						// get and return all the todos after you create another
+						Todo.find(function(err, todos) {
+							if (err)
+								res.send(err);
+							res.json(todos);
+						});
+					}
+				});	
+			}
 		});
 	});
 
