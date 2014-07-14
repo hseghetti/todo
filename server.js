@@ -3,11 +3,19 @@
 	var app      = express(); 								// create our app w/ express
 	var mongoose = require('mongoose'); 					// mongoose for mongodb
 
+	var expressJwt = require('express-jwt');
+	var jwt = require('jsonwebtoken');
+
+	// Protect / routes with JWT
+	var secret = require('./config/secret');
+	app.use('/api', expressJwt({secret: secret.secretToken}));
+
+	app.use(express.json());
+	app.use(express.urlencoded());
+
 // configuration =================
 
-	//mongoose.connect('mongodb://node:node@mongo.onmodulus.net:27017/uwO3mypu'); 	// connect to mongoDB database on modulus.io
-	//new conection
-	mongoose.connect('mongodb://todo:todoapp@novus.modulusmongo.net:27017/aSazy5qa'); 
+	mongoose.connect('mongodb://todo:todoapp@novus.modulusmongo.net:27017/aSazy5qa');
 
 	app.configure(function() {
 		app.use(express.static(__dirname + '/public')); 		// set the static files location /public/img will be /img for users
@@ -17,105 +25,154 @@
 
 
 //define the model ============
-	var Todo = mongoose.model('Todd', {
+	var Todo = new mongoose.Schema({
 		text : String,
 		done : Boolean
-
 	});
+
+	var User = mongoose.model('User', {
+		email : String,
+		pass : String,
+		todos : [Todo]
+	});
+
+
+//Hardcoded User Creation =P
+//create a user temp id=53b4d24f72799b6018000001
+	// User.create({
+	// 	email : 'asd@qwe.com',
+	// 	pass : '123'
+	// }, function(err, user) {
+	// 	if(err) console.log('default user creation fail');
+	// 	else console.log('default user creation success!');
+	// 	}
+	// );
 
 //routes =============================
 	//API
 
-	//get all todos
-	app.get('/api/todos', function(req, res) {
-		Todo.find(function(err, todos) {
-			if (err)
-				res.send(err);
-			res.json(todos);
-		});
+
+	app.post('/authenticate',function (req, res) {
+	    //TODO validate req.body.username and req.body.password
+		//if is invalid, return 401
+		if (!(req.body.username === 'has' && req.body.password === '123')) {
+			res.send(401, 'Wrong user or password');
+			return;
+		}
+		console.log('creando el profile');
+		var profile = {
+			first_name: 'John',
+			last_name: 'Doe',
+			email: 'john@doe.com',
+			id: 123
+		};
+
+	  	// We are sending the profile inside the token
+	  	var token = jwt.sign(profile, secret.secretToken, { expiresInMinutes: 60*5 });
+
+	 	res.json({ token: token });
 	});
 
-	// create todo and send back all todos after creation
+	app.get('/logout', function (req, res){
+		console.log('Logout excecuted');
+		res.send('Logout');
+	});
+
+	app.get('/', function(req, res) {
+
+	});
+
+	//get all todos for a User
+	app.get('/api/todos', function(req, res) {
+		User.findById('53b4d24f72799b6018000001', function(err, user) {
+			if (err){
+				console.log('Could not load Todos for the User');
+				res.send(err);
+			}
+			res.json(user.todos);
+		});
+	});//req.body.user.id
+
+	//New To-Do for a User
 	app.post('/api/todos', function(req, res) {
 
 		// create a todo, information comes from AJAX request from Angular
-		Todo.create({
-			text : req.body.text,
-			done : false
-		}, function(err, todo) {
-			if (err)
-				res.send(err);
+		User.findById('53b4d24f72799b6018000001', function(err, user) {
+			if (err || user == null)
+				console.log('could not find user');
+			else {
+				console.log(user.email);
+				user.todos.push({
+					text : req.body.text,
+					done : false
+				});
 
-			// get and return all the todos after you create another
-			Todo.find(function(err, todos) {
-				if (err)
-					res.send(err)
-				res.json(todos);
-			});
+				user.save(function(err, user) {
+					if (err) console.log('could not save user with the new To-do');
+					else {
+						res.json(user.todos);
+					}
+				});
+			}
 		});
-
 	});
 
-	//todo done
+	//Done To-do
 	app.post('/api/todos/done/:todo_id', function(req, res) {
-		Todo.findById(req.params.todo_id, function(err, todo) {
-			if (!todo)
-				res.send("Could not find Todo");
-			else {
-				todo.done = true;
-				todo.save(function(err) {
+		User.update( {'_id' : '53b4d24f72799b6018000001', 'todos._id' : req.params.todo_id},
+				{$set : {"todos.$.done" : true}},
+				function(err) {
 					if(err) {
-						res.send(err + "error rr");
+						console.log("Could not update the To-do:Done | " + err);
+						res.send(err);
 					} else {
-						// get and return all the todos after you create another
-						Todo.find(function(err, todos) {
-							if (err)
-								res.send(err);
-							res.json(todos);
+						User.findById('53b4d24f72799b6018000001', function(err, user) {
+							if (err || user == null)
+								console.log('could not find user');
+							else
+								res.json(user.todos);
 						});
 					}
-				});	
-			}
-		});
+				}
+		);
 	});
 
-	//todo undone
+ 	//UnDone To-Do
 	app.post('/api/todos/undone/:todo_id', function(req, res) {
-		Todo.findById(req.params.todo_id, function(err, todo) {
-			if (!todo)
-				res.send("Could not find Todo");
-			else {
-				todo.done = false;
-				todo.save(function(err) {
+		User.update( {'_id' : '53b4d24f72799b6018000001', 'todos._id' : req.params.todo_id},
+				{$set : {"todos.$.done" : false}},
+				function(err) {
 					if(err) {
-						res.send(err + "error rr");
+						console.log("Could not update the To-do:Done | " + err);
+						res.send(err);
 					} else {
-						// get and return all the todos after you create another
-						Todo.find(function(err, todos) {
-							if (err)
-								res.send(err);
-							res.json(todos);
+						User.findById('53b4d24f72799b6018000001', function(err, user) {
+							if (err || user == null)
+								console.log('could not find user');
+							else
+								res.json(user.todos);
 						});
 					}
-				});	
-			}
-		});
+				}
+		);
 	});
 
-	// delete a todo
+	//Delete a To-Do
 	app.delete('/api/todos/:todo_id', function(req, res) {
-		Todo.remove({
-			_id : req.params.todo_id
-		}, function(err, todo) {
-			if (err)
-				res.send(err);
-
-			// get and return all the todos after you create another
-			Todo.find(function(err, todos) {
-				if (err)
-					res.send(err)
-				res.json(todos);
-			});
+		User.findById('53b4d24f72799b6018000001', function(err, user) {
+			if (err || user == null)
+				console.log('could not find user to delete the To-Do');
+			else {
+				user.todos.id(req.params.todo_id).remove();
+				user.save(function(err) {
+					if(err){
+						console.log('Could not save User after delete the To-Do');
+						res.send(err);
+					} else {
+						res.json(user.todos);
+					}
+				});
+			}
 		});
 	});
 
