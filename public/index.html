@@ -12,7 +12,7 @@
 
 	<!-- SCROLLS -->
 	<link rel="stylesheet" href="styles/bootstrap-3.2.0-dist/css/bootstrap.min.css"><!-- load bootstrap -->
-	
+
 	<link rel="stylesheet" href="styles/styles.css">
 	<style>
 		html 					{ overflow-y:scroll; }
@@ -22,17 +22,31 @@
 
 	<!-- SPELLS -->
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script><!-- load jquery -->
-	<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.8/angular.min.js"></script><!-- load angular -->
+	<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.min.js"></script><!-- load angular -->
 	<script src="core.js"></script>
 
 </head>
 <!-- SET THE CONTROLLER AND GET ALL TODOS -->
 <body ng-controller="mainController">
 	<div class="container">
-
 		<!-- HEADER AND TODO COUNT -->
 		<div class="jumbotron text-center">
-			<h1>Pending Tasks <span class="label label-info">{{ remaining }}</span></h1>
+		<!-- <h1>{{ login }}  asd</h1> -->
+			<div ng-controller="UserCtrl">
+				<div ng-if="!login">
+					<form ng-submit="submit()">
+						<input ng-model="user.username" type="text" name="user" placeholder="Username" />
+						<input ng-model="user.password" type="password" name="pass" placeholder="Password" />
+						<input type="submit" value="Login" /><br/>
+						<span class="label label-info">Test User: has | Pass: 123</span>
+					</form>
+				</div>
+				<div ng-if="login">
+					<span ng-click="logout()">Logout</span>
+					<h1>Pending Tasks <span class="label label-info">{{ remaining }}</span></h1>
+				</div>
+			</div>
+
 		</div>
 
 		<!-- FORM TO CREATE TODOS -->
@@ -42,11 +56,11 @@
 					<div class="form-group col-sm-12">
 
 						<!-- BIND THIS VALUE TO formData.text IN ANGULAR -->
-						<input type="text" class="form-group col-sm-10 input-lg text-center" placeholder="I have to do..." ng-model="formData.text" ng-minlength=1 required name="todoText" />		
+						<input type="text" class="form-group col-sm-10 input-lg text-center" placeholder="I have to do..." ng-model="formData.text" ng-minlength=1 required name="todoText" />
 						<!-- createToDo() WILL CREATE NEW TODOS -->
-						<button type="submit" class="btn btn-primary col-sm-2 btn-lg" 
+						<button type="submit" class="btn btn-primary col-sm-2 btn-lg"
 						ng-disabled="todoForm.todoText.$invalid" >Add</button>
-					</div>	
+					</div>
 				</form>
 			</div>
 		</div>
@@ -61,10 +75,10 @@
 					<label class="inline">
 						<input type="checkbox" ng-click="doneTodo(todo._id)">
 						<span class="{{todo.done}}">{{ todo.text }}</span>
-					</label> 
+					</label>
 					<span><i class="glyphicon glyphicon-pencil"></i></span>
 					<span ng-click="deleteTodo(todo._id)"><i class="glyphicon glyphicon-remove"></i></span>
-					
+
 				</div>
 
 			</div>
@@ -74,9 +88,9 @@
 				<span class="label label-default">Done To-Do</span>
 				<div class="checkbox" ng-repeat="todo2 in todosDone">
 					<label class="inline">
-						<input type="checkbox" checked ng-click="undoneTodo(todo2._id)"> 
+						<input type="checkbox" checked ng-click="undoneTodo(todo2._id)">
 						<span class="{{todo2.done}}">{{ todo2.text }}</span>
-					</label>	
+					</label>
 					<span><i class="glyphicon glyphicon-pencil"></i></span>
 					<span ng-click="deleteTodo(todo2._id)"><i class="glyphicon glyphicon-remove"></i></span>
 				</div>

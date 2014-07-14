@@ -3,6 +3,16 @@
 	var app      = express(); 								// create our app w/ express
 	var mongoose = require('mongoose'); 					// mongoose for mongodb
 
+	var expressJwt = require('express-jwt');
+	var jwt = require('jsonwebtoken');
+
+	// Protect / routes with JWT
+	var secret = require('./config/secret');
+	app.use('/api', expressJwt({secret: secret.secretToken}));
+
+	app.use(express.json());
+	app.use(express.urlencoded());
+
 // configuration =================
 
 	mongoose.connect('mongodb://todo:todoapp@novus.modulusmongo.net:27017/aSazy5qa');
@@ -40,6 +50,37 @@
 
 //routes =============================
 	//API
+
+
+	app.post('/authenticate',function (req, res) {
+	    //TODO validate req.body.username and req.body.password
+		//if is invalid, return 401
+		if (!(req.body.username === 'has' && req.body.password === '123')) {
+			res.send(401, 'Wrong user or password');
+			return;
+		}
+		console.log('creando el profile');
+		var profile = {
+			first_name: 'John',
+			last_name: 'Doe',
+			email: 'john@doe.com',
+			id: 123
+		};
+
+	  	// We are sending the profile inside the token
+	  	var token = jwt.sign(profile, secret.secretToken, { expiresInMinutes: 60*5 });
+
+	 	res.json({ token: token });
+	});
+
+	app.get('/logout', function (req, res){
+		console.log('Logout excecuted');
+		res.send('Logout');
+	});
+
+	app.get('/', function(req, res) {
+
+	});
 
 	//get all todos for a User
 	app.get('/api/todos', function(req, res) {
